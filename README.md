@@ -1,5 +1,7 @@
 # Dirichlet-Process-Mixture für Sammel-Routen ohne feste Anzahl – Streamlit-Demo
 
+**[→ Demo live ausprobieren](https://sebastianhanisch-dpmm-demo.streamlit.app/)**
+
 Siebtes Stück der "Konzepte"-Reihe für die Website "Sebastian Hanisch – Operations
 Research und Machine Learning", **Fortsetzung von [gmm-demo](../gmm-demo)**: gmm-demo
 benennt im Mathe-Abschnitt offen die eigene verbleibende Schwäche - die Komponentenzahl k
