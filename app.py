@@ -96,16 +96,14 @@ als **Stick-Breaking-Prozess** umformuliert (unendlich viele Mischgewichte, die 
 "abgebrochenen Stücken" eines Stocks der Länge 1 entstehen) und bei einer **Trunkierungsgrenze
 T** abgeschnitten - eine deterministische Optimierung (Koordinatenaufstieg, wie EM in
 gmm-demo) nähert die wahre Posterior-Verteilung an, statt sie über MCMC-Sampling
-asymptotisch exakt, aber langsam zu erreichen. Diese Demo hat ursprünglich einen
-**Collapsed-Gibbs-Sampler** (Neal, 2000) verwendet - exakt, aber deutlich langsamer und
-ohne festen Endzustand (siehe Mathe-Abschnitt für die Gegenüberstellung beider Ansätze).
+asymptotisch exakt, aber langsam zu erreichen.
 
 **Ehrlicher Hinweis, anders als beim Sprung zu Leiden in der Spectral-Linie**: es gibt in
 der Bayesianischen nichtparametrischen Clustering-Welt keinen so klaren De-facto-Standard
 wie Leiden für Netzwerk-Community-Detection. Variational Inference ist die schnellere,
 praxisnähere Alternative zu MCMC (und das, was `sklearn.mixture.BayesianGaussianMixture`
 tatsächlich implementiert) - aber ebenso oft greifen Praktiker zu einfacheren Heuristiken
-(BIC/AIC über ein Standard-GMM). Der Wechsel hier ist also eine Geschwindigkeits- und
+(BIC/AIC über ein Standard-GMM). Die Methode hier ist also eine Geschwindigkeits- und
 Praxis-Entscheidung, keine Behauptung, dies sei "die" unumstrittene beste Methode.
 
 Ein Schritt in der Animation unten ist ein vollständiger **Koordinatenaufstiegs-Zyklus**.
@@ -159,7 +157,7 @@ with st.sidebar:
     )
     truncation = st.slider(
         "T (Trunkierungsgrenze)", *bounds("truncation_slider"), key="truncation_slider",
-        help="Obergrenze für die Anzahl möglicher Cluster - der neue Preis für "
+        help="Obergrenze für die Anzahl möglicher Cluster - der Preis für "
         "Variational Inference statt MCMC. Zu niedrig gewählt deckelt die gefundene "
         "Clusteranzahl hart, unabhängig von α.",
     )
@@ -188,8 +186,8 @@ step = st.slider(
     "Schritt (Iteration)", 0, max_step, key="dp_step",
     help="Schritt 0 = Responsibilities auf den Startparametern, danach je ein "
     "vollständiger Koordinatenaufstiegs-Zyklus. Reglerposition steht standardmäßig auf "
-    "dem letzten (konvergierten) Schritt - anders als beim vorherigen MCMC-Sampler gibt "
-    "es hier ein ECHTES Konvergenzende.",
+    "dem letzten (konvergierten) Schritt, da Variational Inference zu einem echten "
+    "Fixpunkt konvergiert - anders als MCMC-Sampling, das keinen festen Endzustand kennt.",
 )
 
 current_step = result.steps[step]
@@ -254,7 +252,7 @@ elif int(truncation) < instance.k:
     st.warning(
         f"⚠️ Die Trunkierungsgrenze T={int(truncation)} liegt UNTER der wahren "
         f"Gruppenzahl ({instance.k}) - mehr als {int(truncation)} Cluster kann das "
-        f"Modell hier gar nicht finden, unabhängig von α. Das ist der neue Preis für "
+        f"Modell hier gar nicht finden, unabhängig von α. Das ist der Preis für "
         f"Variational Inference: erhöhen Sie T in der Seitenleiste."
     )
 else:
@@ -271,9 +269,7 @@ with st.expander("📐 Mathematische Formulierung"):
 **Modell**: $x_i \sim \mathcal{N}(\mu_{z_i}, \sigma^2 I)$ mit bekannter Varianz $\sigma^2$,
 und einem konjugierten Prior auf die Cluster-Mittelwerte $\mu_c \sim \mathcal{N}(\mu_0,
 \tau^2 I)$ (bewusste Vereinfachung gegenüber gmm-demos voll geschätzter Kovarianz - hier
-soll die automatische Clusterzahl im Fokus stehen, nicht die Kovarianzform). Dieses Modell
-ist unverändert gegenüber der ursprünglichen Fassung dieser Demo - nur die Inferenzmethode
-hat sich geändert.
+soll die automatische Clusterzahl im Fokus stehen, nicht die Kovarianzform).
 
 **Stick-Breaking statt Chinese-Restaurant-Process**: der CRP-Prior lässt sich äquivalent
 als **trunkierter Stick-Breaking-Prozess** schreiben - $\beta_t \sim \text{Beta}(1,\alpha)$
@@ -296,8 +292,8 @@ s_t^2 = \left(\frac{1}{\tau^2}+\frac{N_t}{\sigma^2}\right)^{-1}, \qquad
 m_t = s_t^2\left(\frac{\mu_0}{\tau^2}+\frac{\sum_i\phi_{i,t}x_i}{\sigma^2}\right)
 $$
 
-mit $N_t=\sum_i\phi_{i,t}$ - erkennbar dieselbe Normal-Normal-Update-Struktur wie zuvor,
-nur mit responsibility-gewichteten statt harten Cluster-Summen.
+mit $N_t=\sum_i\phi_{i,t}$ - erkennbar dieselbe Normal-Normal-Update-Struktur wie beim
+gewöhnlichen GMM-EM, nur mit responsibility-gewichteten statt harten Cluster-Summen.
 
 **ELBO** (die zu maximierende untere Schranke): erwartete Log-Likelihood plus erwarteter
 Stick-Breaking-Log-Prior minus Responsibility-Entropie, minus
@@ -305,25 +301,16 @@ $\text{KL}(q(\beta_t)\|\text{Beta}(1,\alpha))$ minus $\text{KL}(q(\mu_t)\|\mathc
 (beide in geschlossener Form). Koordinatenaufstieg garantiert, dass die ELBO bei jedem
 Schritt nicht sinkt (siehe `tests/test_algorithm.py`).
 
-**Vorher: Collapsed Gibbs Sampling** (Neal, 2000, "Algorithm 3") - die ursprüngliche
-Fassung dieser Demo: pro Sweep wird jeder Punkt gedanklich entfernt und neu gezogen,
-gewichtet mit CRP-Prior mal Posterior-Prädiktiv-Likelihood. **Asymptotisch exakt**
-(konvergiert zur wahren Posterior-VERTEILUNG über Partitionen), aber langsam und ohne
-festen Endzustand. Variational Inference **approximiert** dieselbe Posterior durch die
-oben genannte faktorisierte Familie - schneller, deterministisch (bei fester
-Initialisierung), mit einem echten Fixpunkt, aber eben nur eine Näherung.
-
 **Exakte Verifikation, unabhängig von der Inferenzmethode**: die gemeinsame Verteilung der
 Punkte unter dem CRP ist unabhängig von ihrer Erzeugungsreihenfolge (Exchangeability) -
 deshalb lässt sich für eine winzige Instanz die exakte MAP-Partition durch Enumeration
 ALLER möglichen Partitionen berechnen. `tests/test_algorithm.py` prüft, ob Variational
 Inference bei den meisten Zufalls-Initialisierungen zu genau dieser exakten MAP-Partition
-konvergiert - ein direkter "wie gut ist die Approximation"-Nachweis, den der
-samplingbasierte Vorgänger so nicht bieten konnte.
+konvergiert - ein direkter "wie gut ist die Approximation"-Nachweis.
 
-**Ehrlicher Hinweis**: anders als der Sprung zu Leiden in der Spectral-Linie ist dieser
-Wechsel KEIN Sprung zu einem unumstrittenen De-facto-Standard - er ist eine
-Geschwindigkeits-/Praxis-Entscheidung (siehe Intro-Abschnitt oben) mit einem neuen Preis,
+**Ehrlicher Hinweis**: anders als der Sprung zu Leiden in der Spectral-Linie ist diese
+Methodenwahl KEIN Sprung zu einem unumstrittenen De-facto-Standard - sie ist eine
+Geschwindigkeits-/Praxis-Entscheidung (siehe Intro-Abschnitt oben) mit einem Preis,
 der Trunkierungsgrenze $T$.
 
 Implementiert in `dp_algorithm.py` (Variational Inference, Stick-Breaking, ELBO) und
