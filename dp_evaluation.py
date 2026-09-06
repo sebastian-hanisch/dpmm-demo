@@ -22,15 +22,15 @@ def rand_index(true_labels, pred_labels):
     return float(np.mean(same_true == same_pred))
 
 
-def alpha_comparison(data, true_k, alpha_values, sigma2, seed, n_sweeps):
+def alpha_comparison(data, true_k, alpha_values, sigma2, truncation, seed, max_iter):
     """Gefundene vs. wahre Clusteranzahl über mehrere alpha-Werte, jeweils bei
-    Sampler-Endstand - macht direkt sichtbar, wie stark alpha die entdeckte
-    Clusterzahl beeinflusst, ohne dass irgendwo k selbst vorgegeben wurde."""
+    Konvergenz - macht direkt sichtbar, wie stark alpha die entdeckte Clusterzahl
+    beeinflusst, ohne dass irgendwo k selbst vorgegeben wurde."""
     results = {}
     for alpha in alpha_values:
-        result = run(data, alpha, sigma2, seed, n_sweeps=n_sweeps)
+        result = run(data, alpha, sigma2, truncation, seed, max_iter=max_iter)
         results[alpha] = {
-            "found_k": result.final_sweep.n_clusters,
+            "found_k": result.final_step.n_active_components,
             "true_k": true_k,
         }
     return results

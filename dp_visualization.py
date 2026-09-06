@@ -1,7 +1,8 @@
-"""Plotly-Visualisierungen: Punktwolke mit DYNAMISCHEM Farbschema (die Clusteranzahl
-kann von Sweep zu Sweep wachsen/schrumpfen - anders als in jeder anderen Demo dieser
-Reihe, wo die Clusterzahl je Ansicht fest ist), das Clusteranzahl-über-Sweeps-Diagramm
-(zeigt die Stabilisierung des Samplers), Kleinmultiples und der Alpha-Vergleich."""
+"""Plotly-Visualisierungen: Punktwolke mit DYNAMISCHEM Farbschema (die aktive
+Komponentenanzahl kann von Iteration zu Iteration wachsen/schrumpfen - anders als in
+jeder anderen Demo dieser Reihe, wo die Clusterzahl je Ansicht fest ist), das
+Clusteranzahl-über-Iterationen-Diagramm (zeigt die Konvergenz), Kleinmultiples und der
+Alpha-Vergleich."""
 
 import numpy as np
 
@@ -85,13 +86,13 @@ def build_mini_scatter_figure(data, labels):
 def build_cluster_count_chart(cluster_count_trace):
     import plotly.graph_objects as go
 
-    sweeps = list(range(len(cluster_count_trace)))
+    iterations = list(range(len(cluster_count_trace)))
     fig = go.Figure(
-        go.Scatter(x=sweeps, y=list(cluster_count_trace), mode="lines+markers", line=dict(color="#1f77b4"))
+        go.Scatter(x=iterations, y=list(cluster_count_trace), mode="lines+markers", line=dict(color="#1f77b4"))
     )
     fig.update_layout(
         template="plotly_white", height=220,
-        xaxis=dict(title="Sweep", fixedrange=True),
+        xaxis=dict(title="Iteration", fixedrange=True),
         yaxis=dict(title="Gefundene Clusteranzahl", fixedrange=True, dtick=1),
         margin=dict(t=20, l=10, r=10, b=10), showlegend=False,
     )

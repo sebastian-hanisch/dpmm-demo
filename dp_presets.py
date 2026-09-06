@@ -27,6 +27,9 @@ SETTING_SPECS = {
     "seed_input": SettingSpec("seed", int, C.DEFAULT_SEED, 0, 2_000_000_000),
     "alpha_slider": SettingSpec("alpha", float, C.DEFAULT_ALPHA, C.ALPHA_MIN, C.ALPHA_MAX),
     "sigma_slider": SettingSpec("sigma", float, C.DEFAULT_SIGMA, C.SIGMA_MIN, C.SIGMA_MAX),
+    "truncation_slider": SettingSpec(
+        "trunc", int, C.DEFAULT_TRUNCATION, C.TRUNCATION_MIN, C.TRUNCATION_MAX
+    ),
 }
 
 
@@ -61,7 +64,7 @@ def load_permalink_settings():
     st.session_state["permalink_loaded"] = True
 
 
-def sync_query_params(n_points, k, spread, seed, alpha, sigma):
+def sync_query_params(n_points, k, spread, seed, alpha, sigma, truncation):
     try:
         st.query_params["n"] = str(int(n_points))
         st.query_params["k"] = str(int(k))
@@ -69,6 +72,7 @@ def sync_query_params(n_points, k, spread, seed, alpha, sigma):
         st.query_params["seed"] = str(int(seed))
         st.query_params["alpha"] = str(alpha)
         st.query_params["sigma"] = str(sigma)
+        st.query_params["trunc"] = str(int(truncation))
     except Exception:
         pass
 
@@ -80,6 +84,7 @@ def apply_preset(name):
     st.session_state["spread_slider"] = p["spread"]
     st.session_state["alpha_slider"] = p["alpha"]
     st.session_state["sigma_slider"] = p["sigma"]
+    st.session_state["truncation_slider"] = p["truncation"]
     st.session_state["seed_input"] = p["seed"]
 
 

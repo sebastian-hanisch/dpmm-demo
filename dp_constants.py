@@ -5,6 +5,7 @@ DEFAULT_K = 3
 DEFAULT_SPREAD = 0.15
 DEFAULT_ALPHA = 0.3
 DEFAULT_SIGMA = 0.3
+DEFAULT_TRUNCATION = 10
 DEFAULT_SEED = 1
 
 N_POINTS_MIN, N_POINTS_MAX = 30, 200
@@ -12,12 +13,15 @@ K_MIN, K_MAX = 2, 6
 SPREAD_MIN, SPREAD_MAX = 0.05, 0.9
 ALPHA_MIN, ALPHA_MAX = 0.005, 10.0
 SIGMA_MIN, SIGMA_MAX = 0.1, 2.0
+TRUNCATION_MIN, TRUNCATION_MAX = 3, 15
 
-# Hard safety limit - Gibbs-Sampling hat (anders als k-Means' Fixpunkt oder EMs
-# Toleranzschwelle) kein natürliches Abbruchkriterium, es konvergiert zu einer
-# STATIONÄREN VERTEILUNG, nicht zu einem festen Zustand. Begrenzt nur die
-# Animationsschritte.
-MAX_SWEEPS = 50
+# Variational Inference konvergiert (anders als MCMC, das zu einer stationären
+# VERTEILUNG statt einem Fixpunkt konvergiert) zu einem ECHTEN Fixpunkt - ein
+# Toleranzkriterium auf die ELBO-Verbesserung, analog zu gmm-demos
+# LOG_LIKELIHOOD_TOL. MAX_ITERATIONS ist nur die Sicherheitsgrenze, falls die
+# Toleranz nie erreicht wird.
+MAX_ITERATIONS = 100
+ELBO_TOL = 1e-4
 
 RING_RADIUS = 2.0
 
@@ -42,15 +46,18 @@ COMPARISON_SAMPLER_SEED = 1
 
 PRESETS = {
     "Einfaches Beispiel": {
-        "n_points": 90, "k": 3, "spread": 0.15, "alpha": 0.3, "sigma": 0.3, "seed": 1,
+        "n_points": 90, "k": 3, "spread": 0.15, "alpha": 0.3, "sigma": 0.3, "truncation": 10, "seed": 1,
     },
     "Zu kleines α (Unterclustering)": {
-        "n_points": 120, "k": 4, "spread": 0.9, "alpha": 0.01, "sigma": 1.8, "seed": 2,
+        "n_points": 120, "k": 4, "spread": 0.5, "alpha": 0.01, "sigma": 1.0, "truncation": 10, "seed": 1,
     },
     "Zu großes α (Überclustering)": {
-        "n_points": 120, "k": 4, "spread": 0.9, "alpha": 1.0, "sigma": 1.8, "seed": 2,
+        "n_points": 120, "k": 4, "spread": 0.3, "alpha": 8.0, "sigma": 0.6, "truncation": 10, "seed": 4,
+    },
+    "Trunkierung zu niedrig": {
+        "n_points": 120, "k": 6, "spread": 0.15, "alpha": 1.0, "sigma": 0.3, "truncation": 3, "seed": 1,
     },
     "Viele Gruppen": {
-        "n_points": 180, "k": 6, "spread": 0.2, "alpha": 0.5, "sigma": 0.4, "seed": 1,
+        "n_points": 180, "k": 6, "spread": 0.2, "alpha": 0.5, "sigma": 0.4, "truncation": 10, "seed": 1,
     },
 }
