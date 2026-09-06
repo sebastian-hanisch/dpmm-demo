@@ -182,13 +182,17 @@ if "dp_step" not in st.session_state or st.session_state.get("dp_step_owner") !=
 
 st.markdown("## 🎯 Variational Inference in Aktion")
 
-step = st.slider(
-    "Schritt (Iteration)", 0, max_step, key="dp_step",
-    help="Schritt 0 = Responsibilities auf den Startparametern, danach je ein "
-    "vollständiger Koordinatenaufstiegs-Zyklus. Reglerposition steht standardmäßig auf "
-    "dem letzten (konvergierten) Schritt, da Variational Inference zu einem echten "
-    "Fixpunkt konvergiert - anders als MCMC-Sampling, das keinen festen Endzustand kennt.",
-)
+if max_step == 0:
+    step = 0
+    st.caption("Bereits im Startzustand konvergiert - kein Regler nötig.")
+else:
+    step = st.slider(
+        "Schritt (Iteration)", 0, max_step, key="dp_step",
+        help="Schritt 0 = Responsibilities auf den Startparametern, danach je ein "
+        "vollständiger Koordinatenaufstiegs-Zyklus. Reglerposition steht standardmäßig auf "
+        "dem letzten (konvergierten) Schritt, da Variational Inference zu einem echten "
+        "Fixpunkt konvergiert - anders als MCMC-Sampling, das keinen festen Endzustand kennt.",
+    )
 
 current_step = result.steps[step]
 scatter_col, count_col = st.columns(2)
