@@ -13,6 +13,8 @@ import numpy as np
 
 from dp_constants import ARC_RADIUS, ARC_RING_RADIUS, RING_RADIUS
 
+MIN_STD_FRACTION = 0.05
+
 
 @dataclass(frozen=True)
 class ClusteringInstance:
@@ -33,7 +35,7 @@ class ClusteringInstance:
 def _generate_blobs(n_points, k, spread, rng):
     angles = np.linspace(0, 2 * np.pi, k, endpoint=False) + rng.uniform(-0.15, 0.15, size=k)
     centers = np.stack([RING_RADIUS * np.cos(angles), RING_RADIUS * np.sin(angles)], axis=1)
-    std = max(spread, 0.05) * RING_RADIUS
+    std = max(spread, MIN_STD_FRACTION) * RING_RADIUS
 
     counts = np.full(k, n_points // k)
     counts[-1] += n_points - counts.sum()
@@ -56,7 +58,7 @@ def _generate_moons(n_points, k, spread, rng):
     gleich viele Punkte und dasselbe Rauschen."""
     counts = np.full(k, n_points // k)
     counts[-1] += n_points - counts.sum()
-    noise_std = max(spread, 0.05) * ARC_RADIUS * 0.3
+    noise_std = max(spread, MIN_STD_FRACTION) * ARC_RADIUS * 0.3
 
     if k == 2:
         t1 = rng.uniform(0, np.pi, counts[0])
