@@ -38,8 +38,8 @@ st.set_page_config(page_title="Dirichlet-Process-Mixture – Sebastian Hanisch",
 
 
 @st.cache_data(show_spinner=False)
-def _compute_run(n_points, k, spread, seed, alpha, sigma, truncation):
-    instance = generate_instance(n_points, k, spread, seed)
+def _compute_run(n_points, k, spread, shape, seed, alpha, sigma, truncation):
+    instance = generate_instance(n_points, k, spread, seed, shape=shape)
     result = run(instance.as_array(), alpha, sigma ** 2, truncation, seed)
     return instance, result
 
@@ -120,6 +120,7 @@ PRESET_HELP = {
     "Zu großes α (Überclustering)": "Dieselben Gruppen, größeres α - zerfällt in unnötig viele kleine Cluster.",
     "Trunkierung zu niedrig": "Die Trunkierungsgrenze T ist kleiner als die wahre Gruppenzahl - deckelt die gefundene Clusteranzahl hart, unabhängig von α.",
     "Viele Gruppen": "Mehr wahre Gruppen gleichzeitig - zeigt wachsende Komplexität.",
+    "Nicht-konvexe Formen (DPMM überclustert)": "Zwei ineinander verschlungene Halbmonde - DPMM findet hier ehrlich 7-10 statt 2 Cluster, egal welches α: seine Komponenten sind wie bei GMM isotrope Gaußglocken, die eine gebogene Form nur durch viele kleine Kreise annähern können. Das behebt erst dbscan-demo/hdbscan-demo/spectral-demo.",
 }
 preset_cols = st.columns(len(C.PRESETS))
 for i, name in enumerate(C.PRESETS.keys()):
@@ -143,6 +144,14 @@ with st.sidebar:
         help="Klein = Gruppen klar getrennt. Groß = Gruppen überlappen sich spürbar.",
     )
     seed = st.number_input("Zufalls-Seed", *bounds("seed_input"), key="seed_input", step=1)
+
+    st.markdown("**Punktwolken-Form**")
+    shape = st.radio(
+        "Form", options=C.SHAPES, key="shape_radio", format_func=lambda s: C.SHAPE_LABELS[s],
+        help="„Gruppen“: runde, konvexe Cluster - genau das, was DPMMs Gauß-Komponenten "
+        "annehmen. „Halbmonde“: nicht-konvexe Bögen, an denen DPMM ehrlich scheitert "
+        "(siehe Preset unten).",
+    )
 
     st.markdown("**DPMM-Parameter**")
     alpha = st.slider(
@@ -169,13 +178,13 @@ with st.sidebar:
         help="Würfelt einen neuen Zufalls-Seed für die Adressen.",
     )
 
-sync_query_params(n_points, k, spread, seed, alpha, sigma, truncation)
+sync_query_params(n_points, k, spread, seed, shape, alpha, sigma, truncation)
 
 with st.spinner("Führe Variational Inference aus..."):
-    instance, result = _compute_run(int(n_points), int(k), spread, int(seed), alpha, sigma, int(truncation))
+    instance, result = _compute_run(int(n_points), int(k), spread, shape, int(seed), alpha, sigma, int(truncation))
 
 max_step = len(result.steps) - 1
-run_key = (n_points, k, spread, seed, alpha, sigma, truncation)
+run_key = (n_points, k, spread, shape, seed, alpha, sigma, truncation)
 if "dp_step" not in st.session_state or st.session_state.get("dp_step_owner") != run_key:
     st.session_state["dp_step"] = max_step
     st.session_state["dp_step_owner"] = run_key

@@ -20,11 +20,16 @@ class SettingSpec:
     hi: Optional[float] = None
 
 
+def _shape_caster(v):
+    return v if v in C.SHAPES else C.DEFAULT_SHAPE
+
+
 SETTING_SPECS = {
     "n_points_slider": SettingSpec("n", int, C.DEFAULT_N_POINTS, C.N_POINTS_MIN, C.N_POINTS_MAX),
     "k_slider": SettingSpec("k", int, C.DEFAULT_K, C.K_MIN, C.K_MAX),
     "spread_slider": SettingSpec("spread", float, C.DEFAULT_SPREAD, C.SPREAD_MIN, C.SPREAD_MAX),
     "seed_input": SettingSpec("seed", int, C.DEFAULT_SEED, 0, 2_000_000_000),
+    "shape_radio": SettingSpec("shape", _shape_caster, C.DEFAULT_SHAPE),
     "alpha_slider": SettingSpec("alpha", float, C.DEFAULT_ALPHA, C.ALPHA_MIN, C.ALPHA_MAX),
     "sigma_slider": SettingSpec("sigma", float, C.DEFAULT_SIGMA, C.SIGMA_MIN, C.SIGMA_MAX),
     "truncation_slider": SettingSpec(
@@ -64,12 +69,13 @@ def load_permalink_settings():
     st.session_state["permalink_loaded"] = True
 
 
-def sync_query_params(n_points, k, spread, seed, alpha, sigma, truncation):
+def sync_query_params(n_points, k, spread, seed, shape, alpha, sigma, truncation):
     try:
         st.query_params["n"] = str(int(n_points))
         st.query_params["k"] = str(int(k))
         st.query_params["spread"] = str(spread)
         st.query_params["seed"] = str(int(seed))
+        st.query_params["shape"] = shape
         st.query_params["alpha"] = str(alpha)
         st.query_params["sigma"] = str(sigma)
         st.query_params["trunc"] = str(int(truncation))
@@ -82,6 +88,7 @@ def apply_preset(name):
     st.session_state["n_points_slider"] = p["n_points"]
     st.session_state["k_slider"] = p["k"]
     st.session_state["spread_slider"] = p["spread"]
+    st.session_state["shape_radio"] = p["shape"]
     st.session_state["alpha_slider"] = p["alpha"]
     st.session_state["sigma_slider"] = p["sigma"]
     st.session_state["truncation_slider"] = p["truncation"]

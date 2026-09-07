@@ -1,3 +1,5 @@
+import numpy as np
+
 from dp_scenario import generate_instance
 
 
@@ -26,8 +28,6 @@ def test_true_centers_are_well_separated_relative_to_spread():
     centers = instance.as_array()[[instance.true_labels.index(i) for i in range(3)]]
     # grobe Sanity-Pruefung ueber die tatsaechlichen Gruppenmittelwerte, nicht die
     # (verrauschten) true_centers direkt
-    import numpy as np
-
     points = instance.as_array()
     labels = np.array(instance.true_labels)
     means = np.array([points[labels == i].mean(axis=0) for i in range(3)])
@@ -37,3 +37,23 @@ def test_true_centers_are_well_separated_relative_to_spread():
         for j in range(i + 1, 3)
     ]
     assert min(dists) > 1.0
+
+
+def test_default_shape_is_blobs():
+    instance = generate_instance(90, 3, 0.15, seed=1)
+    assert instance.shape == "blobs"
+
+
+def test_moons_shape_produces_two_balanced_groups():
+    instance = generate_instance(100, 2, 0.1, seed=5, shape="moons")
+    assert instance.shape == "moons"
+    labels = np.array(instance.true_labels)
+    counts = np.bincount(labels, minlength=2)
+    assert counts[0] == 50 and counts[1] == 50
+
+
+def test_moons_shape_with_k_greater_than_two_produces_k_balanced_arcs():
+    instance = generate_instance(200, 4, 0.1, seed=6, shape="moons")
+    labels = np.array(instance.true_labels)
+    counts = np.bincount(labels, minlength=4)
+    assert counts.min() == counts.max() == 50
