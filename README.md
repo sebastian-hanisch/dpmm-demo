@@ -52,7 +52,7 @@ Inference:
 - **Zu kleines α (Unterclustering)**: überlappende Gruppen, sehr kleines α - verschmilzt
   zu wenigen, großen Clustern.
 - **Zu großes α (Überclustering)**: eine andere, gut getrennte Szenerie, größeres α -
-  zerfällt in unnötig viele kleine Cluster. Live in der "📐"-Sektion nachgewiesen:
+  zerfällt in mehr Cluster als nötig. Live in der "📐"-Sektion nachgewiesen:
   gefundene vs. wahre Clusteranzahl über eine α-Spanne, nicht nur behauptet.
 - **Trunkierung zu niedrig**: die Trunkierungsgrenze T liegt UNTER der wahren
   Gruppenzahl - deckelt die gefundene Clusteranzahl hart, unabhängig von α. Ein
@@ -104,7 +104,7 @@ Inference hat (anders als der ursprüngliche MCMC-Sampler) ein echtes Toleranzkr
   (`test_reasonable_alpha_recovers_true_cluster_count`,
   `test_small_alpha_causes_underclustering`, `test_large_alpha_causes_overclustering`,
   `test_low_truncation_hard_caps_found_cluster_count`).
-- **Alle fünf Presets direkt gegen das tatsächliche App-Verhalten getestet** (Szenario-Seed
+- **Alle fünf Gruppen-Presets (ohne das Halbmond-Preset) direkt gegen das tatsächliche App-Verhalten getestet** (Szenario-Seed
   UND Inferenz-Seed identisch, wie `app.py` es tatsächlich macht) - ein Preset, das nur mit
   einem anderen (Test-eigenen) Seed funktioniert, aber live ein anderes Ergebnis zeigt,
   wäre sonst unbemerkt geblieben (siehe project-memory für den konkreten Vorfall).
@@ -145,6 +145,4 @@ pytest tests/ -v
 
 ---
 
-Teil des [Operations-Research-Demo-Portfolios](https://sebastianhanisch.net/demos.html) von
-[Sebastian Hanisch](https://sebastianhanisch.net) – Operations Research und Machine Learning.
-Interesse an einer maßgeschneiderten Lösung? [Kontakt aufnehmen](https://sebastianhanisch.net/kontakt.html).
+Diese Demo ist Teil des Portfolios von [Sebastian Hanisch](https://sebastianhanisch.net) – Operations Research und Machine Learning ([Über mich](https://sebastianhanisch.net/ueber-mich.html)). Mehr zur Reihe: [Clustering erklärt: k-Means bis HDBSCAN](https://sebastianhanisch.net/konzepte-clustering.html).

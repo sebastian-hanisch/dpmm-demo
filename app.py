@@ -117,7 +117,7 @@ st.caption("🎯 Schnellstart – ein Beispielszenario laden:")
 PRESET_HELP = {
     "Einfaches Beispiel": "Klar getrennte Gruppen, moderates α - trifft die wahre Clusterzahl zuverlässig.",
     "Zu kleines α (Unterclustering)": "Überlappende Gruppen, sehr kleines α - verschmilzt zu wenigen, großen Clustern.",
-    "Zu großes α (Überclustering)": "Dieselben Gruppen, größeres α - zerfällt in unnötig viele kleine Cluster.",
+    "Zu großes α (Überclustering)": "Wieder vier, aber weniger überlappende Gruppen und deutlich größeres α - zerfällt in mehr Cluster als nötig.",
     "Trunkierung zu niedrig": "Die Trunkierungsgrenze T ist kleiner als die wahre Gruppenzahl - deckelt die gefundene Clusteranzahl hart, unabhängig von α.",
     "Viele Gruppen": "Mehr wahre Gruppen gleichzeitig - zeigt wachsende Komplexität.",
     "Nicht-konvexe Formen (DPMM überclustert)": "Zwei ineinander verschlungene Halbmonde - DPMM findet hier ehrlich 7-10 statt 2 Cluster, egal welches α: seine Komponenten sind wie bei GMM isotrope Gaußglocken, die eine gebogene Form nur durch viele kleine Kreise annähern können. Das behebt erst dbscan-demo/hdbscan-demo/spectral-demo.",
@@ -335,6 +335,6 @@ st.markdown("---")
 
 st.caption(
     "Diese Demo ist Teil des Portfolios von [Sebastian Hanisch](https://sebastianhanisch.net) – "
-    "Operations Research und Machine Learning. Interesse an einer maßgeschneiderten Lösung für "
-    "Ihr Unternehmen? [Kontakt aufnehmen](https://sebastianhanisch.net/kontakt.html)"
+    "Operations Research und Machine Learning ([Über mich](https://sebastianhanisch.net/ueber-mich.html)). "
+    "Mehr zur Reihe: [Clustering erklärt: k-Means bis HDBSCAN](https://sebastianhanisch.net/konzepte-clustering.html)."
 )
